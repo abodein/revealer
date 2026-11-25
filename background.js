@@ -31,7 +31,7 @@ async function openSpeakerView(tab) {
   const created = new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
       chrome.tabs.onCreated.removeListener(on);
-      reject(new Error("speaker view did not open (close any open speaker view and retry)"));
+      reject(new Error("speaker view did not open (is the notes plugin loaded? close any open speaker view and retry)"));
     }, 5000);
     function on(t) {
       clearTimeout(timer);
@@ -46,17 +46,18 @@ async function openSpeakerView(tab) {
   const primaryPattern = url.protocol === "file:" ? `file://${url.pathname}` : `${url.origin}/*`; // no wildcards allowed in file patterns
   await chrome.contentSettings.popups.set({ primaryPattern, setting: "allow" });
   try {
-    const [{ result }] = await chrome.scripting.executeScript({
+    await chrome.scripting.executeScript({
       target: { tabId: tab.id },
       world: "MAIN",
       func: () => {
         const notes = window.Reveal?.getPlugin?.("notes") ?? window.RevealNotes; // reveal 4+/5 : reveal 3
-        if (!notes?.open) return false;
-        notes.open();
+        if (notes?.open) return notes.open(), true;
+        // Bundled decks (Vite, React…) expose no global Reveal: press S, reveal's own speaker-view key.
+        const target = document.querySelector(".reveal") ?? document;
+        target.dispatchEvent(new KeyboardEvent("keydown", { key: "s", code: "KeyS", keyCode: 83, which: 83, bubbles: true }));
         return true;
       },
     });
-    if (!result) throw new Error("This deck has no notes plugin (RevealNotes)");
     return await created;
   } finally {
     await chrome.contentSettings.popups.clear({});

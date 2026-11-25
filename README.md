@@ -17,7 +17,7 @@ Closing the speaker view ends the show: the slides leave fullscreen.
 
 ## Requirements and limits
 
-- The deck must load the reveal.js **notes plugin** (`RevealNotes`), which provides the speaker view. Works with reveal.js 3, 4 and 5.
+- The deck must load the reveal.js **notes plugin** (`RevealNotes`), which provides the speaker view. Works with reveal.js 3, 4 and 5, including bundled apps (Vite, React…) that expose no global `Reveal`: Revealer then presses `S` for you.
 - The laptop screen is the built-in display (or the primary one); the projector is the other screen.
 - If a speaker view is already open, close it before pressing Play.
 - To open the speaker view without a click in the page, Revealer allows popups for the deck's site during the call, then restores your setting.
