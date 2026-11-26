@@ -9,6 +9,15 @@ On a page with a reveal.js deck, the toolbar button turns active. Click it (or p
 
 Closing the speaker view ends the show: the slides leave fullscreen.
 
+### Speaker view
+
+Revealer restyles reveal's speaker view (dark theme, large notes, prominent timer) and adds a **laser pointer**, like PowerPoint:
+
+- Press `L` (or click **Laser (L)**) in the speaker view, then move the mouse over the current-slide preview: a red dot follows it on the projector.
+- Press `L` or `Esc` to turn it off. The dot also disappears when the mouse leaves the preview.
+
+The theme lives in `speaker.css`: edit it to taste, then reload the extension.
+
 ## Install (developer mode)
 
 1. `git clone https://github.com/abodein/revealer`
@@ -28,6 +37,8 @@ Closing the speaker view ends the show: the slides leave fullscreen.
 |---|---|
 | `detect.js` | Content script: finds `.reveal .slides` and turns the button on for that tab. |
 | `background.js` | Reads the screens (`chrome.system.display`), opens the speaker view through the notes plugin, moves each window to its screen and makes it fullscreen. |
+| `speaker.css`, `speaker.js` | Injected into the speaker view: theme and laser pointer. |
+| `laser.js` | Injected into the deck: draws the laser dot at the position the speaker view sends. |
 | `tools/icons.py` | Regenerates `icons/*.png` (pure Python). |
 | `test/e2e.mjs` | End-to-end test with a simulated laptop and projector. |
 

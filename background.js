@@ -18,10 +18,16 @@ async function play(tab) {
   if (!projector) return fullscreenOn(deckWin.id, laptop); // single screen: just the slides, like PowerPoint
 
   // Open the speaker view before any fullscreen: Chrome exits fullscreen when the page opens a popup.
-  const notesWin = (await ownWindow(await openSpeakerView(tab))).id;
+  const notesTab = await openSpeakerView(tab);
+  const notesWin = (await ownWindow(notesTab)).id;
+  await decorate(tab.id, notesTab);
   await fullscreenOn(deckWin.id, projector);
   await fullscreenOn(notesWin, laptop);
-  await chrome.windows.update(notesWin, { focused: true }); // clicker/keys drive the speaker view
+  // Clicker/keys drive the speaker view. macOS Spaces may steal focus back after the animation: insist.
+  for (let i = 0; i < 10 && !(await chrome.windows.get(notesWin)).focused; i++) {
+    await chrome.windows.update(notesWin, { focused: true });
+    await sleep(300);
+  }
   await chrome.storage.session.set({ show: { deckWin: deckWin.id, notesWin } });
 }
 
@@ -64,6 +70,17 @@ async function openSpeakerView(tab) {
   }
 }
 
+// Theme + laser pointer in the speaker view, laser dot receiver in the deck. Cosmetic: never blocks the show.
+async function decorate(deckTab, notesTab) {
+  try {
+    await chrome.scripting.executeScript({ target: { tabId: deckTab }, files: ["laser.js"] });
+    await chrome.scripting.executeScript({ target: { tabId: notesTab }, files: ["speaker.js"] }); // waits for the view
+    await chrome.scripting.insertCSS({ target: { tabId: notesTab }, files: ["speaker.css"] });
+  } catch (e) {
+    console.warn("Revealer: speaker view left unstyled:", e.message);
+  }
+}
+
 // Pull the tab out into a window of its own, so other tabs stay behind (popups may open as tabs).
 async function ownWindow(tabId) {
   const tab = await chrome.tabs.get(tabId);
@@ -75,10 +92,12 @@ async function fullscreenOn(windowId, display) {
   const b = display.bounds;
   await chrome.windows.update(windowId, { state: "normal" });
   await chrome.windows.update(windowId, { left: b.left, top: b.top, width: b.width, height: b.height });
-  await chrome.windows.update(windowId, { state: "fullscreen" });
-  // macOS animates fullscreen; a second request during the animation is dropped, so wait it out.
-  for (let i = 0; i < 30 && (await chrome.windows.get(windowId)).state !== "fullscreen"; i++) await sleep(100);
-  await sleep(800);
+  // macOS animates fullscreen and drops requests made during another window's animation: wait, retry once.
+  for (let attempt = 0; attempt < 2 && (await chrome.windows.get(windowId)).state !== "fullscreen"; attempt++) {
+    await chrome.windows.update(windowId, { state: "fullscreen" });
+    for (let i = 0; i < 30 && (await chrome.windows.get(windowId)).state !== "fullscreen"; i++) await sleep(100);
+    await sleep(800);
+  }
 }
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));

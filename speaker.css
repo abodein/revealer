@@ -1,0 +1,87 @@
+/* Revealer theme for reveal.js speaker view: dark, large readable notes, prominent timer. */
+body {
+  background: #0b1120;
+  color: #e2e8f0;
+  font-family: Inter, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+#current-slide iframe,
+#upcoming-slide iframe {
+  border: 0;
+  border-radius: 10px;
+  background: #000;
+  box-shadow: 0 0 0 1px #1e293b;
+}
+
+#upcoming-slide iframe { opacity: 0.85; }
+
+.overlay-element {
+  background: rgba(15, 23, 42, 0.85);
+  color: #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+.overlay-element.interactive:hover { background: rgba(30, 41, 59, 1); }
+#speaker-layout { color: #cbd5e1; }
+
+#connection-status { background: #0b1120; color: #e2e8f0; }
+
+#speaker-controls { scrollbar-color: #334155 transparent; }
+
+.speaker-controls-time,
+.speaker-controls-pace { border-bottom: 1px solid #1e293b; }
+
+.speaker-controls-time .label,
+.speaker-controls-pace .label,
+.speaker-controls-notes .label {
+  color: #64748b;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.speaker-controls-time .reset-button { color: #94a3b8; }
+
+.speaker-controls-time .timer {
+  font-size: 2.6em;
+  font-variant-numeric: tabular-nums;
+  color: #f8fafc;
+  font-weight: 600;
+}
+.speaker-controls-time .clock {
+  font-size: 1.6em;
+  font-variant-numeric: tabular-nums;
+  color: #94a3b8;
+  padding-top: 0.45em;
+}
+.speaker-controls-time span.mute { opacity: 0.35; }
+.speaker-controls-time .pacing.ahead { color: #60a5fa; }
+.speaker-controls-time .pacing.on-track { color: #34d399; }
+.speaker-controls-time .pacing.behind { color: #f87171; }
+
+.speaker-controls-notes .value {
+  font-size: 1.55em;
+  line-height: 1.5;
+  color: #f1f5f9;
+}
+.speaker-controls-notes .value strong,
+.speaker-controls-notes .value b { color: #67e8f9; }
+
+/* Laser pointer (added by speaker.js) */
+#revealer-laser-toggle {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 3;
+  cursor: pointer;
+  border: 0;
+}
+#revealer-laser-toggle.on { background: #dc2626; color: #fff; }
+#revealer-laser-surface {
+  position: absolute;
+  inset: 6px 0 6px 6px;
+  z-index: 2;
+  display: none;
+  cursor: none;
+}
+body.revealer-laser #revealer-laser-surface { display: block; }
