@@ -18,7 +18,7 @@ assert.equal(await sw.evaluate((id) => chrome.action.isEnabled(id), plainTab.id)
 // Fake a laptop + projector.
 await sw.evaluate(() => { chrome.system.display.getInfo = async () => [
   { id: "1", isInternal: true, isPrimary: true, bounds: { left: 0, top: 0, width: 1440, height: 900 } },
-  { id: "2", isInternal: false, isPrimary: false, bounds: { left: 1440, top: 0, width: 1920, height: 1080 } }]; });
+  { id: "2", isInternal: false, isPrimary: false, bounds: { left: 0, top: 0, width: 1280, height: 720 } /* same area as the laptop: Chrome rejects off-screen bounds */ }]; });
 
 // index.html: classic deck with a global Reveal. bundled.html: ES-module deck with no global (Vite/React builds).
 for (const file of ["index.html", "bundled.html"]) {
